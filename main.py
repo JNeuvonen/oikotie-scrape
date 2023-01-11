@@ -15,11 +15,11 @@ async def main() -> None:
     db = Prisma(auto_register=True)
     await db.connect()
 
-    for i in range(164, last_page + 1):
+    for i in range(1, last_page + 1):
         print(i)
         URL = utils.get_url(i)
         driver.get(URL)
-        time.sleep(0.1)
+        time.sleep(0.5)
         soup = BeautifulSoup(driver.page_source, "html.parser")
         elems = soup.find_all("div", "cards-v2__card")
         for item in elems:
