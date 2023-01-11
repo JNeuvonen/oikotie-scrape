@@ -1,0 +1,6 @@
+[tool.pyright]
+include = [
+    "prisma_test.py",
+]
+
+typeCheckingMode = "strict"
