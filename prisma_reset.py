@@ -10,5 +10,5 @@ async def main() -> None:
     await db.connect()
     await Listing.prisma().delete_many({})
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())
