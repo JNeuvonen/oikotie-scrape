@@ -73,7 +73,7 @@ def fmt_price(price):
 def parse_apartment_feature_text(text):
     # YEAR BUILT
     if is_integer(text):
-        return ("year", int(text))
+        return ("year", float(text))
 
     # SQUARE METERS
     if "m²" in text:
@@ -122,6 +122,7 @@ def get_data_from_card(card):
     href = a_tag.get("href")
 
     ret_dict["url"] = href
+    ret_dict['sale_active'] = True
 
     if "price" in ret_dict and "square_meters" in ret_dict:
 
