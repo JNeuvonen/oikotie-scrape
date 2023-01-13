@@ -19,12 +19,12 @@ model Listing {
     sale_active    Boolean
     price          Float?
     price_to_sqm   Float?
-    address        String
-    year           Float
-    city           String
-    neighborhood   String
+    address        String?
+    year           Float?
+    city           String?
+    neighborhood   String?
     square_meters  Float?
     rooms          Float?
-    apartment_type String
+    apartment_type String?
     url            String    @unique
 }
