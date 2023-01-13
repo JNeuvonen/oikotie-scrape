@@ -1,6 +1,6 @@
 # oikotie-scrape
 
-Scrapes every apartment sale listing on https://www.oikotie.fi/
+Scrapes every apartment sale listing on https://www.oikotie.fi/ to a database and updates the database if any given listing is deleted from oikotie
 
 # Steps to run
 
