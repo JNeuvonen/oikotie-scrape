@@ -16,6 +16,7 @@ model Listing {
     ID             Int       @id @default(autoincrement())
     createdAt      DateTime  @default(now())
     updatedAt      DateTime? @updatedAt
+    sale_active    Boolean
     price          Float?
     price_to_sqm   Float?
     address        String
