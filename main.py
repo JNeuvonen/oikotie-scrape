@@ -52,8 +52,10 @@ async def main() -> None:
     # DEL LISTINGS IN DB THAT WASNT FOUND ON A PASS
     for (key, value) in active_listing_dict.items():
         if value == False:
-            await Listing.prisma().delete(where={
+            await Listing.prisma().update(where={
                 "url": value
+            }, data={
+                "sale_active": False
             })
             total_row_dels += 1
 
@@ -63,5 +65,9 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+
+    pass_count = 0
     while True:
+        print(pass_count)
         asyncio.run(main())
+        pass_count += 1
