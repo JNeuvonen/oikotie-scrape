@@ -1,3 +1,4 @@
+import json
 import time
 from bs4 import BeautifulSoup
 from constants import TARGET_URL
@@ -5,7 +6,7 @@ from selenium import webdriver
 driver = webdriver.Chrome()
 
 
-def get_max_page(driver):
+def get_max_page(driver) -> str:
     """
       Returns:
           int: max page of oikotie pagination
@@ -17,7 +18,7 @@ def get_max_page(driver):
     driver.implicitly_wait(10)
     time.sleep(2)
 
-    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    soup = BeautifulSoup(driver.page_source, "html.parser")
 
     elems = soup.find_all(
         "span", class_="ng-binding")
@@ -27,6 +28,18 @@ def get_max_page(driver):
     time.sleep(2)
 
     return last_page
+
+
+def get_url_dict(arr_of_listing):
+    # generates two dicts for diff after looping through every oikotie page
+
+    ret = {}
+
+    for item in arr_of_listing:
+        url = str(item.url)
+        ret[url] = False
+
+    return ret
 
 
 def get_url(page):
@@ -43,7 +56,7 @@ def is_integer(str):
 
 def fmt_square_meters(sqm):
 
-    sqm = sqm.replace(u'\xa0', "")
+    sqm = sqm.replace(u"\xa0", "")
     return sqm
 
 
@@ -53,14 +66,14 @@ def fmt_price(price):
         return None
 
     price = price.replace("€", "")
-    price = price.replace(u'\xa0', "")
+    price = price.replace(u"\xa0", "")
     return int(price)
 
 
 def parse_apartment_feature_text(text):
     # YEAR BUILT
     if is_integer(text):
-        return ('year', int(text))
+        return ("year", int(text))
 
     # SQUARE METERS
     if "m²" in text:
@@ -96,10 +109,10 @@ def get_data_from_card(card):
     features_text = info_div.find_all(
         "div", "card-features__value")
 
-    ret_dict['price'] = fmt_price(price.get_text())
-    ret_dict['address'] = address_text.get_text()
-    ret_dict['city'] = city
-    ret_dict['neighborhood'] = neighborhood
+    ret_dict["price"] = fmt_price(price.get_text())
+    ret_dict["address"] = address_text.get_text()
+    ret_dict["city"] = city
+    ret_dict["neighborhood"] = neighborhood
 
     for item in features_text:
         tuple_item = parse_apartment_feature_text(item.get_text())
@@ -108,20 +121,20 @@ def get_data_from_card(card):
     a_tag = card.a
     href = a_tag.get("href")
 
-    ret_dict['url'] = href
+    ret_dict["url"] = href
 
     if "price" in ret_dict and "square_meters" in ret_dict:
 
         ret_dict["square_meters"] = fmt_square_meters(
             ret_dict["square_meters"])
 
-        if ret_dict['price'] != None and ret_dict['square_meters'] != None:
-            square_meters = ret_dict['square_meters']
+        if ret_dict["price"] != None and ret_dict["square_meters"] != None:
+            square_meters = ret_dict["square_meters"]
 
-            if ',' in square_meters:
+            if "," in square_meters:
                 square_meters = float(square_meters.replace(",", "."))
 
-            ret_dict['square_meters'] = float(square_meters)
+            ret_dict["square_meters"] = float(square_meters)
 
             ret_dict["price_to_sqm"] = float(
                 ret_dict["price"] / float(square_meters))
