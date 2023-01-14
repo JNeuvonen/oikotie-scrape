@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Listing" ALTER COLUMN "price" DROP NOT NULL,
-ALTER COLUMN "rooms" DROP NOT NULL;

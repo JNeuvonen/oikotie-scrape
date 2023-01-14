@@ -1,6 +1,0 @@
--- AlterTable
-ALTER TABLE "Listing" ALTER COLUMN "city" DROP NOT NULL,
-ALTER COLUMN "neighborhood" DROP NOT NULL,
-ALTER COLUMN "apartment_type" DROP NOT NULL,
-ALTER COLUMN "address" DROP NOT NULL,
-ALTER COLUMN "year" DROP NOT NULL;
