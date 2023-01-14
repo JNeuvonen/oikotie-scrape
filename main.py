@@ -15,13 +15,17 @@ last_page = int(utils.get_max_page(driver))
 
 async def main() -> None:
 
+    # DB
     db = Prisma(auto_register=True)
     await db.connect()
 
-    listing_urls = await Listing.prisma().find_many()
-
     # LIST OF URLS, USED TO DELETE LISTINGS FROM DB THAT WAS MISSED ON A LOOP
+    listing_urls = await Listing.prisma().find_many()
     active_listing_dict = utils.get_url_dict(listing_urls)
+
+    # UTIL
+    added_listings = 0
+    t_start = time.time()
 
     # LOOP OIKOTIE LISTING PAGES
     for i in range(1, last_page + 1):
@@ -44,24 +48,28 @@ async def main() -> None:
                     await Listing.prisma().create(
                         data=sale_listing_object
                     )
+                    added_listings += 1
                 except Exception:
                     pass
 
-    total_row_dels = 0
-
     # DEL LISTINGS IN DB THAT WASNT FOUND ON A PASS
+    deleted_listings = 0
     for (key, value) in active_listing_dict.items():
         if value == False:
+            deleted_listings += 1
             await Listing.prisma().update(where={
                 "url": value
             }, data={
                 "sale_active": False
             })
-            total_row_dels += 1
 
+    t_end = time.time()
     print("-----------------------------------")
-    print("total row dels: " + str(total_row_dels))
+    print("total row dels: " + str(deleted_listings))
+    print("total row adds: " + str(added_listings))
+    print("Time for pass measured: {}".format(str(t_end-t_start)))
     print("-----------------------------------")
+    await db.disconnect()
 
 
 if __name__ == "__main__":
