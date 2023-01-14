@@ -5,6 +5,9 @@ import utils
 import asyncio
 from prisma import Prisma
 from prisma.models import Listing
+from prisma.models import PriceChange
+from datetime import datetime
+import json
 
 
 driver = webdriver.Chrome()
@@ -41,25 +44,49 @@ async def main() -> None:
 
             if sale_listing_object != None:
                 listing_url = sale_listing_object["url"]
-                # FLAG URL FOUND TO NOT BE DELETED
+                # FLAG URL FOUND, HELPS LATER WITH REMOVAL PASS
                 if listing_url in active_listing_dict:
                     active_listing_dict[listing_url] = True
-                try:
-                    await Listing.prisma().create(
-                        data=sale_listing_object
-                    )
-                    added_listings += 1
-                except Exception:
-                    pass
+
+                fetched_listing = await Listing.prisma().find_first(where={'url': listing_url})
+
+                # CREATE LISTING IF DOESNT EXIST IN DB
+                if fetched_listing == None:
+                    try:
+                        await Listing.prisma().create(
+                            data=sale_listing_object
+                        )
+                        added_listings += 1
+                    except Exception:
+                        pass
+                # ELSE CHECK IF PRICE UPDATED
+                else:
+                    fetched_listing_price = float(fetched_listing.price)
+                    scraped_listing_price = sale_listing_object['price']
+
+                    # UPDATE PRICE CHANGE HISTORY
+                    if fetched_listing_price != scraped_listing_price:
+
+                        await PriceChange.prisma().create(
+                            {
+                                "price_change": float((scraped_listing_price - fetched_listing_price)),
+                                "Listing": {
+                                    "connect": {
+                                        "ID": fetched_listing.ID
+                                    }
+                                }
+                            }
+                        )
+                        await Listing.prisma().update(where={'url': listing_url},
+                                                      data={"price": float(scraped_listing_price)})
 
     # DEL LISTINGS IN DB THAT WASNT FOUND ON A PASS
     deleted_listings = 0
     for (key, value) in active_listing_dict.items():
         if value == False:
             deleted_listings += 1
+
             await Listing.prisma().update(where={
-                "url": value
-            }, data={
                 "sale_active": False
             })
 
