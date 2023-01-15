@@ -21,7 +21,11 @@ async def main() -> None:
     await db.connect()
 
     # LIST OF URLS, USED TO DELETE LISTINGS FROM DB THAT WAS MISSED ON A LOOP
-    listing_urls = await Listing.prisma().find_many()
+    listing_urls = await Listing.prisma().find_many(
+        where={
+            'sale_active': False
+        }
+    )
     active_listing_dict = utils.get_url_dict(listing_urls)
 
     # UTIL
@@ -29,7 +33,7 @@ async def main() -> None:
     t_start = time.time()
 
     # LOOP OIKOTIE LISTING PAGES
-    for i in range(1790, last_page + 1):
+    for i in range(1, last_page + 1):
         print("page: " + str(i))
         URL = utils.get_url(i)
         driver.get(URL)
