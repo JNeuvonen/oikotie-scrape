@@ -6,8 +6,6 @@ import asyncio
 from prisma import Prisma
 from prisma.models import Listing
 from prisma.models import PriceChange
-from datetime import datetime
-import json
 
 
 driver = webdriver.Chrome()
@@ -31,7 +29,7 @@ async def main() -> None:
     t_start = time.time()
 
     # LOOP OIKOTIE LISTING PAGES
-    for i in range(1, last_page + 1):
+    for i in range(1790, last_page + 1):
         print("page: " + str(i))
         URL = utils.get_url(i)
         driver.get(URL)
@@ -80,13 +78,15 @@ async def main() -> None:
                         await Listing.prisma().update(where={'url': listing_url},
                                                       data={"price": float(scraped_listing_price)})
 
-    # DEL LISTINGS IN DB THAT WASNT FOUND ON A PASS
+    # FLAG LISTINGS UNACTIVE IF WASNT FOUND ON A PASS
     deleted_listings = 0
     for (key, value) in active_listing_dict.items():
         if value == False:
             deleted_listings += 1
 
             await Listing.prisma().update(where={
+                "url": key
+            }, data={
                 "sale_active": False
             })
 
